@@ -10,13 +10,15 @@ export default function Home() {
     const [path, setPath] = useState<string>("/cloud_disk");
     return (
         <PathContext.Provider value={{ path, setPath }}>
-            <div className="container flex flex-col mx-auto">
+            <div className="container flex flex-col mx-auto h-screen">
                 <div className="w-full bg-gray-300 px-2">
                     <Navbar />
                 </div>
-                <div className="w-full flex">
-                    <div className="flex flex-1 flex-col bg-white">sidebar</div>
-                    <div className="bg-sky-200 flex-1">
+                <div className="w-full flex flex-1">
+                    <div className="flex flex-1/4 flex-col bg-gray-100">
+                        sidebar
+                    </div>
+                    <div className="flex-3/4">
                         <Content />
                     </div>
                 </div>
