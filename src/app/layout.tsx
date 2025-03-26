@@ -1,6 +1,5 @@
-import type { Metadata } from "next";
 import "@/styles/globals.css";
-
+import Icon from "@/components/icon";
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -8,7 +7,10 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="zh-CN">
-            <body>{children}</body>
+            <body>
+                <Icon />
+                {children}
+            </body>
         </html>
     );
 }
