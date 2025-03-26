@@ -11,6 +11,8 @@ export default function Content({
     setPre,
     cur,
     setCur,
+    refresh,
+    setRefresh,
 }: {
     path: string;
     setPath: (path: string) => void;
@@ -19,6 +21,8 @@ export default function Content({
     setPre: (pre: string) => void;
     cur: string;
     setCur: (cur: string) => void;
+    refresh: boolean;
+    setRefresh: (fresh: boolean) => void;
 }) {
     const [data, setData] = useState<string[]>([]);
     const input = useRef<HTMLInputElement>(null);
@@ -30,8 +34,12 @@ export default function Content({
             const json = await response.json();
             setData(json);
         }
-        fetchData();
-    }, [path]);
+        try {
+            fetchData();
+        } catch (error) {
+            console.log(error);
+        }
+    }, [path, refresh]);
 
     async function CreateFolder() {
         try {
@@ -47,6 +55,7 @@ export default function Content({
                     }),
                 }
             );
+            setRefresh(!refresh);
         } catch (error) {
             console.error("创建文件夹错误:", error);
         }

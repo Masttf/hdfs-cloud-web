@@ -7,6 +7,7 @@ export default function Home() {
     const [isInput, setIsInput] = useState<boolean>(false);
     const [pre, setPre] = useState<string>("");
     const [cur, setCur] = useState<string>("");
+    const [refresh, setRefresh] = useState<boolean>(false);
     return (
         <div className="container flex flex-col mx-auto h-screen">
             <div className="w-full bg-gray-200 px-2">
@@ -14,7 +15,7 @@ export default function Home() {
                     path={path}
                     setPath={setPath}
                     setIsInput={setIsInput}
-                    {...{ pre, setPre, cur, setCur }}
+                    {...{ pre, setPre, cur, setCur, refresh, setRefresh }}
                 />
             </div>
             <div className="w-full flex flex-1">
@@ -23,7 +24,7 @@ export default function Home() {
                     setPath={setPath}
                     isInput={isInput}
                     setIsInput={setIsInput}
-                    {...{ setPre, cur, setCur }}
+                    {...{ setPre, cur, setCur, refresh, setRefresh }}
                 />
             </div>
         </div>

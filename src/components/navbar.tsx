@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 function getfileName(name: string) {
     return name.split("-").slice(1).join().replace("-", ".");
@@ -12,6 +12,8 @@ export default function Navbar({
     setPre,
     cur,
     setCur,
+    refresh,
+    setRefresh,
 }: {
     path: string;
     setPath: (path: string) => void;
@@ -20,6 +22,8 @@ export default function Navbar({
     setPre: (pre: string) => void;
     cur: string;
     setCur: (cur: string) => void;
+    refresh: boolean;
+    setRefresh: (fresh: boolean) => void;
 }) {
     useEffect(() => {
         if (pre !== "") {
@@ -54,6 +58,7 @@ export default function Navbar({
                     }),
                 }
             );
+            setRefresh(!refresh);
         } catch (e) {
             console.log(e);
             alert("删除失败");
@@ -81,11 +86,26 @@ export default function Navbar({
                     body: formData,
                 }
             );
+            setRefresh(!refresh);
         } catch (e) {
             console.error(e);
             alert("上传失败，请检查网络");
         }
     }
+    const query = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        const handleEnterKey = (e: KeyboardEvent) => {
+            if (e.key === "Enter") {
+                if (!query.current) return;
+                setPath(query.current?.value);
+            }
+        };
+        document.addEventListener("keydown", handleEnterKey);
+        return () => {
+            document.removeEventListener("keydown", handleEnterKey);
+        };
+    }, []);
     return (
         <div className="px-1 flex gap-4 h-14 text-xl items-center">
             <div
@@ -102,9 +122,11 @@ export default function Navbar({
                     <use href="#arrow-left" />
                 </svg>
             </div>
-            <div className="bg-gray-100 px-2 py-1 flex-1 rounded-md font-bold">
-                {path}
-            </div>
+            <input
+                ref={query}
+                defaultValue={path}
+                className="bg-gray-100 px-2 py-1 flex-1 outline-0 rounded-md font-bold"
+            ></input>
             <input
                 type="file"
                 id="fileInput"
@@ -172,6 +194,20 @@ export default function Navbar({
                     className="text-2xl"
                 >
                     <use href="#trash" />
+                </svg>
+            </div>
+            <div
+                title="刷新"
+                className=" hover:text-sky-500 cursor-pointer"
+                onClick={() => setRefresh(!refresh)}
+            >
+                <svg
+                    height="1em"
+                    width="1em"
+                    viewBox="0 0 512 512"
+                    className="text-2xl text-sky-500"
+                >
+                    <use href="#fresh" />
                 </svg>
             </div>
         </div>
