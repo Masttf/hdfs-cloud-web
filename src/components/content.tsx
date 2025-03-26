@@ -1,18 +1,25 @@
 "use client";
 import React, { useEffect, useRef } from "react";
-import { useContext } from "react";
 import { useState } from "react";
-import { PathContext } from "@/app/page";
 import Folder from "./folder";
 import File from "./file";
 export default function Content({
+    path,
+    setPath,
     isInput,
     setIsInput,
+    setPre,
+    cur,
+    setCur,
 }: {
+    path: string;
+    setPath: (path: string) => void;
     isInput: boolean;
     setIsInput: (isInput: boolean) => void;
+    setPre: (pre: string) => void;
+    cur: string;
+    setCur: (cur: string) => void;
 }) {
-    const { path, setPath } = useContext(PathContext);
     const [data, setData] = useState<string[]>([]);
     const input = useRef<HTMLInputElement>(null);
     useEffect(() => {
@@ -72,9 +79,24 @@ export default function Content({
             {data.map((item: string) => {
                 return (() => {
                     if (item.includes(".")) {
-                        return <File key={item} name={item}></File>;
+                        return (
+                            <File
+                                key={item}
+                                name={item}
+                                path={path}
+                                {...{ setPre, cur, setCur }}
+                            ></File>
+                        );
                     } else {
-                        return <Folder key={item} name={item}></Folder>;
+                        return (
+                            <Folder
+                                key={item}
+                                name={item}
+                                path={path}
+                                setPath={setPath}
+                                {...{ setPre, cur, setCur }}
+                            ></Folder>
+                        );
                     }
                 })();
             })}

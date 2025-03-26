@@ -1,7 +1,17 @@
-import React, { useContext } from "react";
-import { PathContext } from "@/app/page";
-export default function File({ name }: { name: string }) {
-    const { path, setPath } = useContext(PathContext);
+import React from "react";
+export default function File({
+    name,
+    path,
+    setPre,
+    cur,
+    setCur,
+}: {
+    name: string;
+    path: string;
+    setPre: (pre: string) => void;
+    cur: string;
+    setCur: (cur: string) => void;
+}) {
     async function Download(name: string) {
         try {
             const response = await fetch(
@@ -35,11 +45,25 @@ export default function File({ name }: { name: string }) {
             alert("文件下载失败，请重试");
         }
     }
+    const fileName = `file-${name.split(".").join("-")}`;
     return (
         <div
-            className="px-2 py-1 rounded-sm text-xl font-bold hover:bg-sky-200"
+            id={fileName}
+            className="flex items-center gap-4 px-2 py-1 rounded-sm text-xl font-bold hover:bg-sky-200"
             onDoubleClick={() => Download(name)}
+            onClick={() => {
+                setPre(cur);
+                setCur(fileName);
+            }}
         >
+            <svg
+                className="text-xl text-slate-400"
+                viewBox="0 0 348 512"
+                height="1em"
+                width="1em"
+            >
+                <use href="#file" />
+            </svg>
             {name}
         </div>
     );

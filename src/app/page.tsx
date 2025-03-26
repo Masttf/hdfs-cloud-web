@@ -1,24 +1,31 @@
 "use client";
 import Content from "@/components/content";
 import Navbar from "@/components/navbar";
-import { createContext, useState } from "react";
-export const PathContext = createContext({
-    path: "",
-    setPath: (path: string) => {},
-});
+import { useState } from "react";
 export default function Home() {
     const [path, setPath] = useState<string>("/cloud_disk");
     const [isInput, setIsInput] = useState<boolean>(false);
+    const [pre, setPre] = useState<string>("");
+    const [cur, setCur] = useState<string>("");
     return (
-        <PathContext.Provider value={{ path, setPath }}>
-            <div className="container flex flex-col mx-auto h-screen">
-                <div className="w-full bg-gray-200 px-2">
-                    <Navbar setIsInput={setIsInput} />
-                </div>
-                <div className="w-full flex flex-1">
-                    <Content isInput={isInput} setIsInput={setIsInput} />
-                </div>
+        <div className="container flex flex-col mx-auto h-screen">
+            <div className="w-full bg-gray-200 px-2">
+                <Navbar
+                    path={path}
+                    setPath={setPath}
+                    setIsInput={setIsInput}
+                    {...{ pre, setPre, cur, setCur }}
+                />
             </div>
-        </PathContext.Provider>
+            <div className="w-full flex flex-1">
+                <Content
+                    path={path}
+                    setPath={setPath}
+                    isInput={isInput}
+                    setIsInput={setIsInput}
+                    {...{ setPre, cur, setCur }}
+                />
+            </div>
+        </div>
     );
 }
