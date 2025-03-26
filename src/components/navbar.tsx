@@ -22,7 +22,6 @@ export default function Navbar({
     setCur: (cur: string) => void;
 }) {
     useEffect(() => {
-        console.log(pre, cur);
         if (pre !== "") {
             const dom = document.querySelector(`#${pre}`);
             dom?.classList.remove("chose");
@@ -60,6 +59,33 @@ export default function Navbar({
             alert("删除失败");
         }
     }
+    async function handleFileUpload(
+        event: React.ChangeEvent<HTMLInputElement>
+    ) {
+        const files = event.target.files;
+        if (!files || files.length === 0) {
+            return;
+        }
+        const file = files[0];
+        const hdfsPath = path; // 使用当前路径作为上传目标路径
+
+        try {
+            const formData = new FormData();
+            formData.append("file", file);
+            formData.append("hdfsPath", hdfsPath);
+            console.log(formData);
+            const response = await fetch(
+                "http://localhost:8080/api/hdfs/upload",
+                {
+                    method: "POST",
+                    body: formData,
+                }
+            );
+        } catch (e) {
+            console.error(e);
+            alert("上传失败，请检查网络");
+        }
+    }
     return (
         <div className="px-1 flex gap-4 h-14 text-xl items-center">
             <div
@@ -79,9 +105,16 @@ export default function Navbar({
             <div className="bg-gray-100 px-2 py-1 flex-1 rounded-md font-bold">
                 {path}
             </div>
+            <input
+                type="file"
+                id="fileInput"
+                style={{ display: "none" }}
+                onChange={(e) => handleFileUpload(e)}
+            />
             <div
                 title="上传文件"
                 className=" hover:text-sky-500 cursor-pointer"
+                onClick={() => document.getElementById("fileInput")?.click()}
             >
                 <svg
                     height="1em"

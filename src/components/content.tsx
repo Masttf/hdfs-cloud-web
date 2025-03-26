@@ -68,7 +68,7 @@ export default function Content({
         };
     }, [isInput]);
     return (
-        <div className="flex flex-col py-2 px-4 border border-gray-300 w-full">
+        <div className="flex flex-col gap-1 py-2 px-4 border border-gray-300 w-full">
             {isInput && (
                 <input
                     className="px-2 py-1 rounded-sm text-xl font-bold outline-sky-200"
