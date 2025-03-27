@@ -1,5 +1,1 @@
 @import "tailwindcss";
-
-.chose {
-    @apply bg-sky-200;
-}

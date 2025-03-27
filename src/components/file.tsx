@@ -1,16 +1,14 @@
 import React from "react";
+import { RefObject } from "react";
+import { Fileitem } from "@/app/page";
 export default function File({
     name,
     path,
-    setPre,
-    cur,
-    setCur,
+    select,
 }: {
     name: string;
     path: string;
-    setPre: (pre: string) => void;
-    cur: string;
-    setCur: (cur: string) => void;
+    select: RefObject<Set<Fileitem>>;
 }) {
     async function Download(name: string) {
         try {
@@ -48,14 +46,20 @@ export default function File({
     const fileName = `file-${name.split(".").join("-")}`;
     return (
         <div
-            id={fileName}
             className="flex items-center gap-4 px-2 py-1 rounded-sm text-xl font-bold hover:bg-sky-200"
             onDoubleClick={() => Download(name)}
-            onClick={() => {
-                setPre(cur);
-                setCur(fileName);
-            }}
         >
+            <input
+                type="checkbox"
+                className="w-4 h-4"
+                onChange={(e) => {
+                    if (e.target.checked) {
+                        select.current?.add({ name, type: "file" });
+                    } else {
+                        select.current?.delete({ name, type: "file" });
+                    }
+                }}
+            />
             <svg
                 className="text-xl text-slate-400"
                 viewBox="0 0 348 512"

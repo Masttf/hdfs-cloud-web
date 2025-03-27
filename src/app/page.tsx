@@ -2,12 +2,17 @@
 import Content from "@/components/content";
 import Navbar from "@/components/navbar";
 import { useState } from "react";
+import { useRef } from "react";
+
+export interface Fileitem {
+    name: string;
+    type: "file" | "folder";
+}
 export default function Home() {
     const [path, setPath] = useState<string>("/cloud_disk");
     const [isInput, setIsInput] = useState<boolean>(false);
-    const [pre, setPre] = useState<string>("");
-    const [cur, setCur] = useState<string>("");
     const [refresh, setRefresh] = useState<boolean>(false);
+    const select = useRef<Set<Fileitem>>(new Set<Fileitem>());
     return (
         <div className="container flex flex-col mx-auto h-screen">
             <div className="w-full bg-gray-200 px-2">
@@ -15,7 +20,9 @@ export default function Home() {
                     path={path}
                     setPath={setPath}
                     setIsInput={setIsInput}
-                    {...{ pre, setPre, cur, setCur, refresh, setRefresh }}
+                    refresh={refresh}
+                    setRefresh={setRefresh}
+                    select={select}
                 />
             </div>
             <div className="w-full flex flex-1">
@@ -24,7 +31,9 @@ export default function Home() {
                     setPath={setPath}
                     isInput={isInput}
                     setIsInput={setIsInput}
-                    {...{ setPre, cur, setCur, refresh, setRefresh }}
+                    refresh={refresh}
+                    setRefresh={setRefresh}
+                    select={select}
                 />
             </div>
         </div>

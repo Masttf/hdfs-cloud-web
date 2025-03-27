@@ -1,68 +1,89 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
-
-function getfileName(name: string) {
-    return name.split("-").slice(1).join().replace("-", ".");
-}
+import React, { RefObject, useEffect, useRef, useState } from "react";
+import { Fileitem } from "@/app/page";
 export default function Navbar({
     path,
     setPath,
     setIsInput,
-    pre,
-    setPre,
-    cur,
-    setCur,
     refresh,
     setRefresh,
+    select,
 }: {
     path: string;
     setPath: (path: string) => void;
     setIsInput: (isInput: boolean) => void;
-    pre: string;
-    setPre: (pre: string) => void;
-    cur: string;
-    setCur: (cur: string) => void;
     refresh: boolean;
     setRefresh: (fresh: boolean) => void;
+    select: RefObject<Set<Fileitem>>;
 }) {
-    useEffect(() => {
-        if (pre !== "") {
-            const dom = document.querySelector(`#${pre}`);
-            dom?.classList.remove("chose");
-        }
-        if (cur !== "") {
-            const dom = document.querySelector(`#${cur}`);
-            dom?.classList.add("chose");
-        }
-    }, [pre, cur]);
     function handleback() {
         if (path === "/cloud_disk") return;
-        setPre("");
-        setCur("");
         setPath(path.split("/").slice(0, -1).join("/"));
     }
-    async function handleDelete() {
-        if (cur === "") return;
-        const fileName = getfileName(cur);
-        try {
-            console.log(fileName);
-            const response = await fetch(
-                "http://localhost:8080/api/hdfs/delete",
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        path: `${path}/${fileName}`,
-                    }),
-                }
-            );
-            setRefresh(!refresh);
-        } catch (e) {
-            console.log(e);
-            alert("删除失败");
+    function handleDelete() {
+        async function Delete(fileName: string) {
+            try {
+                console.log(fileName);
+                const response = await fetch(
+                    "http://localhost:8080/api/hdfs/delete",
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            path: `${path}/${fileName}`,
+                        }),
+                    }
+                );
+                setRefresh(!refresh);
+            } catch (e) {
+                console.log(e);
+                alert("删除失败");
+            }
         }
+        select.current.forEach((item) => {
+            Delete(item.name);
+        });
+    }
+
+    function handleDownload() {
+        async function Download(fileName: string) {
+            try {
+                const response = await fetch(
+                    `http://localhost:8080/api/hdfs/download?hdfsFilePath=${path}/${fileName}`
+                );
+
+                if (!response.ok) throw new Error("下载失败");
+
+                // 获取文件名（两种方式）
+                const filename =
+                    // 方式1：从Content-Disposition头解析（推荐）
+                    response.headers
+                        .get("content-disposition")
+                        ?.split("filename=")[1]
+                        .replace(/"/g, "") ||
+                    // 方式2：手动拼接（后备方案）
+                    `${fileName}`;
+
+                // 创建可下载链接
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = filename;
+                a.click();
+
+                // 清理资源
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error("下载错误:", error);
+                alert("文件下载失败，请重试");
+            }
+        }
+        select.current.forEach((item) => {
+            Download(item.name);
+        });
     }
     async function handleFileUpload(
         event: React.ChangeEvent<HTMLInputElement>
@@ -135,7 +156,7 @@ export default function Navbar({
             />
             <div
                 title="上传文件"
-                className=" hover:text-sky-500 cursor-pointer"
+                className="cursor-pointer hover:text-sky-500"
                 onClick={() => document.getElementById("fileInput")?.click()}
             >
                 <svg
@@ -148,29 +169,8 @@ export default function Navbar({
                 </svg>
             </div>
             <div
-                title="下载文件"
-                className=" hover:text-sky-500 cursor-pointer"
-                onClick={() => {
-                    if (cur === "" || !cur.startsWith("file-")) return;
-                    document
-                        .querySelector<HTMLElement>(`#${cur}`)
-                        ?.dispatchEvent(
-                            new MouseEvent("dblclick", { bubbles: true })
-                        );
-                }}
-            >
-                <svg
-                    height="1em"
-                    width="1em"
-                    viewBox="0 0 512 512"
-                    className="text-2xl"
-                >
-                    <use href="#download" />
-                </svg>
-            </div>
-            <div
                 title="新建文件夹"
-                className="hover:text-sky-500 cursor-pointer"
+                className="cursor-pointer hover:text-sky-500"
                 onClick={() => setIsInput(true)}
             >
                 <svg
@@ -180,6 +180,20 @@ export default function Navbar({
                     width="1em"
                 >
                     <use href="#folder-plus" />
+                </svg>
+            </div>
+            <div
+                title="下载文件"
+                className="cursor-pointer hover:text-sky-500"
+                onClick={handleDownload}
+            >
+                <svg
+                    height="1em"
+                    width="1em"
+                    viewBox="0 0 512 512"
+                    className="text-2xl"
+                >
+                    <use href="#download" />
                 </svg>
             </div>
             <div
@@ -205,9 +219,9 @@ export default function Navbar({
                     height="1em"
                     width="1em"
                     viewBox="0 0 512 512"
-                    className="text-2xl text-sky-500"
+                    className="text-2xl"
                 >
-                    <use href="#fresh" />
+                    <use href="#refresh" />
                 </svg>
             </div>
         </div>

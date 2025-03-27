@@ -3,28 +3,30 @@ import React, { useEffect, useRef } from "react";
 import { useState } from "react";
 import Folder from "./folder";
 import File from "./file";
+import { RefObject } from "react";
+import { Fileitem } from "@/app/page";
+interface fileInfo {
+    name: string;
+    directory: boolean;
+}
 export default function Content({
     path,
     setPath,
     isInput,
     setIsInput,
-    setPre,
-    cur,
-    setCur,
     refresh,
     setRefresh,
+    select,
 }: {
     path: string;
     setPath: (path: string) => void;
     isInput: boolean;
     setIsInput: (isInput: boolean) => void;
-    setPre: (pre: string) => void;
-    cur: string;
-    setCur: (cur: string) => void;
     refresh: boolean;
     setRefresh: (fresh: boolean) => void;
+    select: RefObject<Set<Fileitem>>;
 }) {
-    const [data, setData] = useState<string[]>([]);
+    const [data, setData] = useState<fileInfo[]>([]);
     const input = useRef<HTMLInputElement>(null);
     useEffect(() => {
         async function fetchData() {
@@ -32,6 +34,7 @@ export default function Content({
                 `http://localhost:8080/api/hdfs/list?hdfsDir=${path}`
             );
             const json = await response.json();
+            console.log(json);
             setData(json);
         }
         try {
@@ -85,25 +88,26 @@ export default function Content({
                     ref={input}
                 />
             )}
-            {data.map((item: string) => {
+            {data.map((item: fileInfo) => {
+                console.log(item);
                 return (() => {
-                    if (item.includes(".")) {
+                    if (!item.directory) {
                         return (
                             <File
-                                key={item}
-                                name={item}
+                                key={item.name}
+                                name={item.name}
                                 path={path}
-                                {...{ setPre, cur, setCur }}
+                                select={select}
                             ></File>
                         );
                     } else {
                         return (
                             <Folder
-                                key={item}
-                                name={item}
+                                key={item.name}
+                                name={item.name}
                                 path={path}
                                 setPath={setPath}
-                                {...{ setPre, cur, setCur }}
+                                select={select}
                             ></Folder>
                         );
                     }
