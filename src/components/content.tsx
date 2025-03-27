@@ -5,8 +5,10 @@ import Folder from "./folder";
 import File from "./file";
 import { RefObject } from "react";
 import { Fileitem } from "@/app/page";
+import { HdfsService } from "../services/hdfsService";
 interface fileInfo {
     name: string;
+    size: number;
     directory: boolean;
 }
 export default function Content({
@@ -30,34 +32,24 @@ export default function Content({
     const input = useRef<HTMLInputElement>(null);
     useEffect(() => {
         async function fetchData() {
-            const response = await fetch(
-                `http://localhost:8080/api/hdfs/list?hdfsDir=${path}`
-            );
-            const json = await response.json();
-            console.log(json);
-            setData(json);
+            try {
+                const { data } = await HdfsService.listDirectory(path);
+                if (data) {
+                    setData(data);
+                }
+            } catch (error) {
+                console.error("获取目录内容失败:", error);
+            }
         }
-        try {
-            fetchData();
-        } catch (error) {
-            console.log(error);
-        }
+        fetchData();
     }, [path, refresh]);
 
     async function CreateFolder() {
         try {
-            const response = await fetch(
-                `http://localhost:8080/api/hdfs/mkdir`,
-                {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        path: `${path}/${input.current?.value || "新建文件夹"}`,
-                    }),
-                }
-            );
+            const folderPath = `${path}/${
+                input.current?.value || "新建文件夹"
+            }`;
+            await HdfsService.createDirectory(folderPath);
             setRefresh(!refresh);
         } catch (error) {
             console.error("创建文件夹错误:", error);

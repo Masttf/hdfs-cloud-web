@@ -1,6 +1,7 @@
 "use client";
 import React, { RefObject, useEffect, useRef, useState } from "react";
 import { Fileitem } from "@/app/page";
+import { HdfsService } from "../services/hdfsService";
 export default function Navbar({
     path,
     setPath,
@@ -23,26 +24,13 @@ export default function Navbar({
     function handleDelete() {
         async function Delete(fileName: string) {
             try {
-                console.log(fileName);
-                const response = await fetch(
-                    "http://localhost:8080/api/hdfs/delete",
-                    {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            path: `${path}/${fileName}`,
-                        }),
-                    }
-                );
+                await HdfsService.deleteResource(`${path}/${fileName}`);
                 setRefresh(!refresh);
-            } catch (e) {
-                console.log(e);
-                alert("删除失败");
+            } catch (error) {
+                console.error("删除失败:", error);
             }
         }
-        select.current.forEach((item) => {
+        select.current?.forEach((item) => {
             Delete(item.name);
         });
     }
@@ -50,38 +38,12 @@ export default function Navbar({
     function handleDownload() {
         async function Download(fileName: string) {
             try {
-                const response = await fetch(
-                    `http://localhost:8080/api/hdfs/download?hdfsFilePath=${path}/${fileName}`
-                );
-
-                if (!response.ok) throw new Error("下载失败");
-
-                // 获取文件名（两种方式）
-                const filename =
-                    // 方式1：从Content-Disposition头解析（推荐）
-                    response.headers
-                        .get("content-disposition")
-                        ?.split("filename=")[1]
-                        .replace(/"/g, "") ||
-                    // 方式2：手动拼接（后备方案）
-                    `${fileName}`;
-
-                // 创建可下载链接
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                const a = document.createElement("a");
-                a.href = url;
-                a.download = filename;
-                a.click();
-
-                // 清理资源
-                window.URL.revokeObjectURL(url);
+                await HdfsService.downloadFile(`${path}/${fileName}`);
             } catch (error) {
                 console.error("下载错误:", error);
-                alert("文件下载失败，请重试");
             }
         }
-        select.current.forEach((item) => {
+        select.current?.forEach((item) => {
             Download(item.name);
         });
     }
@@ -93,24 +55,12 @@ export default function Navbar({
             return;
         }
         const file = files[0];
-        const hdfsPath = path; // 使用当前路径作为上传目标路径
 
         try {
-            const formData = new FormData();
-            formData.append("file", file);
-            formData.append("hdfsPath", hdfsPath);
-            console.log(formData);
-            const response = await fetch(
-                "http://localhost:8080/api/hdfs/upload",
-                {
-                    method: "POST",
-                    body: formData,
-                }
-            );
+            await HdfsService.uploadFile(file, path);
             setRefresh(!refresh);
-        } catch (e) {
-            console.error(e);
-            alert("上传失败，请检查网络");
+        } catch (error) {
+            console.error("上传失败:", error);
         }
     }
     const query = useRef<HTMLInputElement>(null);
