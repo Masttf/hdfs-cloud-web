@@ -5,7 +5,8 @@ import Folder from "./folder";
 import File from "./file";
 import { RefObject } from "react";
 import { Fileitem } from "@/app/page";
-import { HdfsService } from "../services/hdfsService";
+import { HdfsService } from "@/services/hdfsService";
+import { message } from "antd";
 interface fileInfo {
     name: string;
     size: number;
@@ -32,13 +33,11 @@ export default function Content({
     const input = useRef<HTMLInputElement>(null);
     useEffect(() => {
         async function fetchData() {
-            try {
-                const { data } = await HdfsService.listDirectory(path);
-                if (data) {
-                    setData(data);
-                }
-            } catch (error) {
-                console.error("获取目录内容失败:", error);
+            const result = await HdfsService.listDirectory(path);
+            if (result.data) {
+                setData(result.data);
+            } else if (result.error) {
+                message.error(result.error);
             }
         }
         fetchData();
@@ -49,10 +48,15 @@ export default function Content({
             const folderPath = `${path}/${
                 input.current?.value || "新建文件夹"
             }`;
-            await HdfsService.createDirectory(folderPath);
-            setRefresh(!refresh);
+            const result = await HdfsService.createDirectory(folderPath);
+            if (result.error) {
+                message.error(result.error);
+            } else {
+                message.success("文件夹创建成功");
+                setRefresh(!refresh);
+            }
         } catch (error) {
-            console.error("创建文件夹错误:", error);
+            message.error("创建文件夹失败");
         }
     }
 
@@ -81,7 +85,6 @@ export default function Content({
                 />
             )}
             {data.map((item: fileInfo) => {
-                console.log(item);
                 return (() => {
                     if (!item.directory) {
                         return (

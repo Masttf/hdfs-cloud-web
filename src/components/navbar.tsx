@@ -1,7 +1,8 @@
 "use client";
-import React, { RefObject, useEffect, useRef, useState } from "react";
+import React, { RefObject, useEffect, useRef } from "react";
 import { Fileitem } from "@/app/page";
 import { HdfsService } from "../services/hdfsService";
+import { message } from "antd";
 export default function Navbar({
     path,
     setPath,
@@ -24,10 +25,17 @@ export default function Navbar({
     function handleDelete() {
         async function Delete(fileName: string) {
             try {
-                await HdfsService.deleteResource(`${path}/${fileName}`);
-                setRefresh(!refresh);
+                const result = await HdfsService.deleteResource(
+                    `${path}/${fileName}`
+                );
+                if (result.error) {
+                    message.error(`删除 ${fileName} 失败: ${result.error}`);
+                } else {
+                    message.success(`删除 ${fileName} 成功`);
+                    setRefresh(!refresh);
+                }
             } catch (error) {
-                console.error("删除失败:", error);
+                message.error(`删除 ${fileName} 失败`);
             }
         }
         select.current?.forEach((item) => {
@@ -38,13 +46,22 @@ export default function Navbar({
     function handleDownload() {
         async function Download(fileName: string) {
             try {
-                await HdfsService.downloadFile(`${path}/${fileName}`);
+                const result = await HdfsService.downloadFile(
+                    `${path}/${fileName}`
+                );
+                if (result.error) {
+                    message.error(`下载 ${fileName} 失败: ${result.error}`);
+                } else {
+                    message.success(`下载 ${fileName} 成功`);
+                }
             } catch (error) {
-                console.error("下载错误:", error);
+                message.error(`下载 ${fileName} 失败`);
             }
         }
         select.current?.forEach((item) => {
-            Download(item.name);
+            if (item.type === "file") {
+                Download(item.name);
+            }
         });
     }
     async function handleFileUpload(
@@ -57,10 +74,15 @@ export default function Navbar({
         const file = files[0];
 
         try {
-            await HdfsService.uploadFile(file, path);
-            setRefresh(!refresh);
+            const result = await HdfsService.uploadFile(file, path);
+            if (result.error) {
+                message.error(`上传文件失败: ${result.error}`);
+            } else {
+                message.success("文件上传成功");
+                setRefresh(!refresh);
+            }
         } catch (error) {
-            console.error("上传失败:", error);
+            message.error("文件上传失败");
         }
     }
     const query = useRef<HTMLInputElement>(null);

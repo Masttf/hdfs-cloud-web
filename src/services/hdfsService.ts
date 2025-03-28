@@ -1,5 +1,3 @@
-import { message } from "antd";
-
 interface FileInfo {
     name: string;
     size: number;
@@ -17,7 +15,7 @@ export const HdfsService = {
     async uploadFile(
         file: File,
         path: string = "/cloud_disk"
-    ): Promise<ApiResponse<{ message: string }>> {
+    ): Promise<ApiResponse<void>> {
         try {
             const formData = new FormData();
             formData.append("file", file);
@@ -35,14 +33,11 @@ export const HdfsService = {
             return { data: await response.json() };
         } catch (error: unknown) {
             const err = error as Error;
-            message.error(err.message || "文件上传失败");
-            return { error: err.message };
+            return { error: err.message || "文件上传失败" };
         }
     },
 
-    async createDirectory(
-        path: string
-    ): Promise<ApiResponse<{ message: string }>> {
+    async createDirectory(path: string): Promise<ApiResponse<void>> {
         try {
             const response = await fetch(`${API_BASE_URL}/directories`, {
                 method: "POST",
@@ -59,12 +54,11 @@ export const HdfsService = {
             return { data: await response.json() };
         } catch (error: unknown) {
             const err = error as Error;
-            message.error(err.message || "目录创建失败");
-            return { error: err.message };
+            return { error: err.message || "目录创建失败" };
         }
     },
 
-    async downloadFile(path: string): Promise<void> {
+    async downloadFile(path: string): Promise<ApiResponse<void>> {
         try {
             const response = await fetch(
                 `${API_BASE_URL}/files?path=${encodeURIComponent(path)}`
@@ -83,9 +77,10 @@ export const HdfsService = {
             a.click();
             document.body.removeChild(a);
             window.URL.revokeObjectURL(url);
+            return { data: undefined };
         } catch (error: unknown) {
             const err = error as Error;
-            message.error(err.message || "文件下载失败");
+            return { error: err.message || "文件下载失败" };
         }
     },
 
@@ -103,8 +98,7 @@ export const HdfsService = {
             return { data: await response.json() };
         } catch (error: unknown) {
             const err = error as Error;
-            message.error(err.message || "获取目录内容失败");
-            return { error: err.message };
+            return { error: err.message || "获取目录内容失败" };
         }
     },
 
@@ -125,8 +119,7 @@ export const HdfsService = {
             return { data: undefined };
         } catch (error: unknown) {
             const err = error as Error;
-            message.error(err.message || "删除操作失败");
-            return { error: err.message };
+            return { error: err.message || "删除操作失败" };
         }
     },
 
@@ -146,8 +139,7 @@ export const HdfsService = {
             return { data: await response.json() };
         } catch (error: unknown) {
             const err = error as Error;
-            message.error(err.message || "获取文件元数据失败");
-            return { error: err.message };
+            return { error: err.message || "获取文件元数据失败" };
         }
     },
 };

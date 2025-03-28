@@ -2,6 +2,7 @@ import React from "react";
 import { RefObject } from "react";
 import { Fileitem } from "@/app/page";
 import { HdfsService } from "../services/hdfsService";
+import { message } from "antd";
 export default function File({
     name,
     path,
@@ -11,14 +12,20 @@ export default function File({
     path: string;
     select: RefObject<Set<Fileitem>>;
 }) {
-    async function Download(name: string) {
+    async function Download(fileName: string) {
         try {
-            await HdfsService.downloadFile(`${path}/${name}`);
+            const result = await HdfsService.downloadFile(
+                `${path}/${fileName}`
+            );
+            if (result.error) {
+                message.error(`下载 ${fileName} 失败: ${result.error}`);
+            } else {
+                message.success(`下载 ${fileName} 成功`);
+            }
         } catch (error) {
-            console.error("下载错误:", error);
+            message.error(`下载 ${fileName} 失败`);
         }
     }
-    const fileName = `file-${name.split(".").join("-")}`;
     return (
         <div
             className="flex items-center gap-4 px-2 py-1 rounded-sm text-xl font-bold hover:bg-sky-200"
