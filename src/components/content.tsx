@@ -8,11 +8,7 @@ import { RefObject } from "react";
 import { Fileitem } from "@/app/page";
 import { HdfsService } from "@/services/hdfsService";
 import { message } from "antd";
-interface fileInfo {
-    name: string;
-    size: number;
-    directory: boolean;
-}
+import { FileInfo } from "../services/hdfsService";
 export default function Content({
     path,
     setPath,
@@ -30,7 +26,7 @@ export default function Content({
     setRefresh: (fresh: boolean) => void;
     select: RefObject<Set<Fileitem>>;
 }) {
-    const [data, setData] = useState<fileInfo[]>([]);
+    const [data, setData] = useState<FileInfo[]>([]);
     const input = useRef<HTMLInputElement>(null);
     useEffect(() => {
         async function fetchData() {
@@ -85,7 +81,8 @@ export default function Content({
                     ref={input}
                 />
             )}
-            {data.map((item: fileInfo) => {
+            {data.map((item: FileInfo) => {
+                console.log(item);
                 return (() => {
                     if (!item.directory) {
                         return (
@@ -94,7 +91,9 @@ export default function Content({
                                 name={item.name}
                                 path={path}
                                 select={select}
-                            ></File>
+                                size={item.size}
+                                lastModified={item.lastModified}
+                            />
                         );
                     } else {
                         return (
@@ -104,6 +103,8 @@ export default function Content({
                                 path={path}
                                 setPath={setPath}
                                 select={select}
+                                size={item.size}
+                                lastModified={item.lastModified}
                             ></Folder>
                         );
                     }

@@ -1,7 +1,8 @@
-interface FileInfo {
+export interface FileInfo {
     name: string;
     size: number;
     directory: boolean;
+    lastModified: number;
 }
 
 interface ApiResponse<T> {
@@ -9,7 +10,7 @@ interface ApiResponse<T> {
     error?: string;
 }
 
-const API_BASE_URL = "http://localhost:8080/api/hdfs";
+const API_BASE_URL = "http://47.97.84.151:8080/api/hdfs";
 
 export const HdfsService = {
     async uploadFile(
