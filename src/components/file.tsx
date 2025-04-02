@@ -45,6 +45,7 @@ export default function File({
             message.error(`下载 ${fileName} 失败`);
         }
     }
+    const file: Fileitem = { name: name, type: "file" };
     return (
         <div
             className="w-full flex items-center px-2 py-1 rounded-sm text-xl font-bold hover:bg-sky-200"
@@ -56,9 +57,9 @@ export default function File({
                     className="w-4 h-4"
                     onChange={(e) => {
                         if (e.target.checked) {
-                            select.current?.add({ name, type: "file" });
+                            select.current?.add(file);
                         } else {
-                            select.current?.delete({ name, type: "file" });
+                            select.current?.delete(file);
                         }
                     }}
                 />

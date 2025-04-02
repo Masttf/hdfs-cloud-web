@@ -30,6 +30,7 @@ export default function Folder({
     size: number;
     lastModified: number;
 }) {
+    const file: Fileitem = { name: name, type: "folder" };
     return (
         <div
             className="w-full flex items-center px-2 py-1 rounded-sm text-xl font-bold cursor-default hover:bg-sky-200"
@@ -41,9 +42,9 @@ export default function Folder({
                     className="w-4 h-4"
                     onChange={(e) => {
                         if (e.target.checked) {
-                            select.current?.add({ name, type: "folder" });
+                            select.current?.add(file);
                         } else {
-                            select.current?.delete({ name, type: "folder" });
+                            select.current?.delete(file);
                         }
                     }}
                 />

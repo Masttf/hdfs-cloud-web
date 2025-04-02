@@ -41,6 +41,7 @@ export default function Navbar({
             }
         }
         select.current?.forEach((item) => {
+            console.log(item.name);
             Delete(item.name);
         });
     }
@@ -108,6 +109,9 @@ export default function Navbar({
     const curPath = useRef<string>(path);
     useEffect(() => {
         curPath.current = path;
+        if (query.current) {
+            query.current.value = path;
+        }
     }, [path]);
     async function handleQuery() {
         if (!query.current) return;
@@ -169,7 +173,6 @@ export default function Navbar({
                     <input
                         type="text"
                         ref={query}
-                        defaultValue={path}
                         className="w-full bg-gray-100 px-2 py-1 outline-0 rounded-md font-bold"
                     />
                 )}
