@@ -10,7 +10,6 @@ export interface Fileitem {
 }
 export default function Home() {
     const [path, setPath] = useState<string>("/cloud_disk");
-    const [isInput, setIsInput] = useState<boolean>(false);
     const [refresh, setRefresh] = useState<boolean>(false);
     const select = useRef<Set<Fileitem>>(new Set<Fileitem>());
     return (
@@ -19,7 +18,6 @@ export default function Home() {
                 <Navbar
                     path={path}
                     setPath={setPath}
-                    setIsInput={setIsInput}
                     refresh={refresh}
                     setRefresh={setRefresh}
                     select={select}
@@ -29,8 +27,6 @@ export default function Home() {
                 <Content
                     path={path}
                     setPath={setPath}
-                    isInput={isInput}
-                    setIsInput={setIsInput}
                     refresh={refresh}
                     setRefresh={setRefresh}
                     select={select}

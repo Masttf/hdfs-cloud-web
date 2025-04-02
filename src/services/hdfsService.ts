@@ -143,4 +143,22 @@ export const HdfsService = {
             return { error: err.message || "获取文件元数据失败" };
         }
     },
+
+    async isDirectoryExist(hdfsDirPath: string): Promise<ApiResponse<boolean>> {
+        try {
+            const response = await fetch(
+                `${API_BASE_URL}/dir?hdfsDirPath=${encodeURIComponent(
+                    hdfsDirPath
+                )}`
+            );
+            const data = await response.json();
+            if (!response.ok || data === false) {
+                throw new Error("检查目录是否存在失败");
+            }
+            return { data };
+        } catch (error: unknown) {
+            const err = error as Error;
+            return { error: err.message || "检查目录是否存在失败" };
+        }
+    },
 };
